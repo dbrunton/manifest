@@ -12,10 +12,6 @@ import (
 	"bytes"
 )
 
-func main() {
-	Manifest("data")
-}
-
 func Manifest(dir string) string {
 
 	buffer := bytes.NewBufferString("")
@@ -24,14 +20,15 @@ func Manifest(dir string) string {
 
 	for _, entry := range directoryContents {
 
-		if entry.IsDirectory() {
-			Manifest(fmt.Sprintf("%s/%s", dir, entry.Name))
+		if entry.IsDir() {
+			Manifest(fmt.Sprintf("%s/%s", dir, entry.Name()))
 
 		} else {
-			contents, _ := ioutil.ReadFile(entry.Name)
+			contents, _ := ioutil.ReadFile(entry.Name())
 			var h hash.Hash = md5.New()
+			var b []byte
 			h.Write([]byte(contents))
-			fmt.Fprintf(buffer, "%s/%s\t%x\n", dir, entry.Name, h.Sum())
+			fmt.Fprintf(buffer, "%s/%s\t%x\n", dir, entry.Name(), h.Sum(b))
 		}
 	}
 
