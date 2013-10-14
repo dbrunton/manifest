@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"fmt"
 	"crypto/md5"
@@ -22,9 +23,11 @@ func main() {
 }
 
 func (m Manifest) String() (s string) {
+	buffer := bytes.NewBufferString("")
 	for _, entry := range m {
-		fmt.Fprintf(s, "%s\t%x\n", entry.path, entry.checksum)
+		fmt.Fprintf(buffer, "%s\t%x\n", entry.path, entry.checksum)
 	}
+	return string(buffer)
 }
 
 func listFiles(dir string) (files []string) {
