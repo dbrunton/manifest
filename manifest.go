@@ -1,5 +1,4 @@
-//package manifest
-package main
+package manifest
 
 import (
 	"bytes"
@@ -18,16 +17,12 @@ type ManifestEntry struct {
 
 type Manifest []ManifestEntry
 
-func main() {
-	fmt.Println(makeManifest("data"));
-}
-
 func (m Manifest) String() (s string) {
 	buffer := bytes.NewBufferString("")
 	for _, entry := range m {
 		fmt.Fprintf(buffer, "%s\t%x\n", entry.path, entry.checksum)
 	}
-	return string(buffer)
+	return string(buffer.Bytes())
 }
 
 func listFiles(dir string) (files []string) {
@@ -53,7 +48,7 @@ func checksum(file string) ManifestEntry {
 	return ManifestEntry{ file, h.Sum(b) }
 }
 
-func makeManifest(dir string) (manifest Manifest) {
+func MakeManifest(dir string) (manifest Manifest) {
 
 	for _, path := range listFiles(dir) {
 		manifest = append(manifest, checksum(path))
