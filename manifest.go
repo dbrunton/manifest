@@ -1,37 +1,60 @@
-package manifest
-/* package manifest */
-
-/* create a type to have the path (e.g. Name) and checksum, return that,
-   print it out at the end.  Then do it all over in goroutines.  */
+//package manifest
+package main
 
 import (
 	"io/ioutil"
 	"fmt"
 	"crypto/md5"
 	"hash"
-	"bytes"
+	"path/filepath"
+	"os"
 )
 
-func Manifest(dir string) string {
+type ManifestEntry struct {
+	path string
+	checksum []byte
+}
 
-	buffer := bytes.NewBufferString("")
+type Manifest []ManifestEntry
 
-	directoryContents, _ := ioutil.ReadDir(dir)
+func main() {
+	fmt.Println(makeManifest("data"));
+}
 
-	for _, entry := range directoryContents {
-
-		if entry.IsDir() {
-			Manifest(fmt.Sprintf("%s/%s", dir, entry.Name()))
-
-		} else {
-			contents, _ := ioutil.ReadFile(entry.Name())
-			var h hash.Hash = md5.New()
-			var b []byte
-			h.Write([]byte(contents))
-			fmt.Fprintf(buffer, "%s/%s\t%x\n", dir, entry.Name(), h.Sum(b))
-		}
+func (m Manifest) String() (s string) {
+	for _, entry := range m {
+		fmt.Fprintf(s, "%s\t%x\n", entry.path, entry.checksum)
 	}
+}
 
-	return string(buffer.Bytes())
+func listFiles(dir string) (files []string) {
+	err := filepath.Walk("./data",
+			     func(path string, f os.FileInfo, err error) error {
+				     if f.IsDir() {
+					     return nil
+				     }
+				     files = append(files, filepath.Clean(path));
+				     return nil;
+			     })
+	if err != nil {
+		panic(err)
+	}
+	return
+}
+
+func checksum(file string) ManifestEntry {
+	contents, _ := ioutil.ReadFile(file)
+	var h hash.Hash = md5.New()
+	var b []byte
+	h.Write([]byte(contents))
+	return ManifestEntry{ file, h.Sum(b) }
+}
+
+func makeManifest(dir string) (manifest Manifest) {
+
+	for _, path := range listFiles(dir) {
+		manifest = append(manifest, checksum(path))
+	}
+	return
 }
 
