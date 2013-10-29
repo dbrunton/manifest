@@ -65,7 +65,7 @@ func checksum(file string) ManifestEntry {
 	return ManifestEntry{file, h.Sum(b)}
 }
 
-func MakeManifest(dir string) (manifest Manifest) {
+func Create(dir string) (manifest Manifest) {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
