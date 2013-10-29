@@ -29,7 +29,7 @@ type ByPath struct{ Manifest }
 func (s ByPath) Less(i, j int) bool { return s.Manifest[i].path < s.Manifest[j].path }
 
 func (m Manifest) String() (s string) {
-	sort.Sort(m)
+	sort.Sort(ByPath{m})
 	buffer := bytes.NewBufferString("")
 	for _, entry := range m {
 		fmt.Fprintf(buffer, "%s\t%x\n", entry.path, entry.checksum)
