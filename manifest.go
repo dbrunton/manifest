@@ -65,7 +65,11 @@ func checksum(file string) ManifestEntry {
 	return ManifestEntry{file, h.Sum(b)}
 }
 
-func Create(dir string) (manifest Manifest) {
+func Load(s string) (m Manifest) {
+	return
+}
+
+func Create(dir string) (m Manifest) {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -85,9 +89,9 @@ func Create(dir string) (manifest Manifest) {
 	wg.Wait()
 	close(ch)
 
-	for e := range ch {
+	for me := range ch {
 		// grab off of a channel
-		manifest = append(manifest, e)
+		m = append(m, me)
 	}
 	return
 }
