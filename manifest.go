@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-
+	"sort"
 	"sync"
 )
 
@@ -20,7 +20,16 @@ type ManifestEntry struct {
 
 type Manifest []ManifestEntry
 
+func (m Manifest) Len() int { return len(m) }
+
+func (m Manifest) Swap(i, j int) { m[i], m[j] = m[j], m[i] }
+
+type ByPath struct{ Manifest }
+
+func (s ByPath) Less(i, j int) bool { return s.Manifest[i].path < s.Manifest[j].path }
+
 func (m Manifest) String() (s string) {
+	sort.Sort(m)
 	buffer := bytes.NewBufferString("")
 	for _, entry := range m {
 		fmt.Fprintf(buffer, "%s\t%x\n", entry.path, entry.checksum)
