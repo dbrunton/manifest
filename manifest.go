@@ -3,6 +3,7 @@ package manifest
 import (
 	"bytes"
 	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -27,6 +29,16 @@ func (m Manifest) Swap(i, j int) { m[i], m[j] = m[j], m[i] }
 type ByPath struct{ Manifest }
 
 func (s ByPath) Less(i, j int) bool { return s.Manifest[i].path < s.Manifest[j].path }
+
+func Compare (m, n Manifest) bool {
+	sort.Sort(ByPath{m})
+	sort.Sort(ByPath{n})
+
+	if m.String() == n.String() {
+		return true
+	}
+	return false
+}
 
 func (m Manifest) String() (s string) {
 	sort.Sort(ByPath{m})
@@ -66,6 +78,16 @@ func checksum(file string) ManifestEntry {
 }
 
 func Load(s string) (m Manifest) {
+	lines := strings.Split(s, "\n")
+	for _, line := range lines {
+		fields := strings.Split(line, "\t")
+		if len(fields) > 1 {
+			checksum, _ := hex.DecodeString(fields[1])
+			path := fields[0]
+			me := ManifestEntry{path, checksum}
+			m = append(m, me)
+		}
+	}
 	return
 }
 
