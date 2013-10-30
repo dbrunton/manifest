@@ -1,5 +1,1 @@
-Manifest is a Go library to create and verify manifests of the format:
-
-filepath\tmd5sum\nfilepath-2\tmd5sum-2\n
-
-For the most part, it's currently just a way to learn some more Go and work with files.
+Read, write, and compare manifests.
